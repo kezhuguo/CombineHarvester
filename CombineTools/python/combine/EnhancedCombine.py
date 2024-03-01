@@ -42,6 +42,8 @@ class EnhancedCombine(CombineToolBase):
                            help='Name used to label the combine output file, can be modified by other options')
         group.add_argument(
             '--setParameterRanges', help='Some other options will modify or add to the list of parameter ranges')
+        group.add_argument('--robustHesseSplit',
+                            help='For use with "-M MultiDimFit" to split calculation of "--robustHesse" into separate jobs')
 
 
     def attach_args(self, group):
@@ -238,8 +240,16 @@ class EnhancedCombine(CombineToolBase):
                 ['--firstPoint %(P_START)s --lastPoint %(P_END)s'])
             self.args.name += '.POINTS.%(P_START)s.%(P_END)s'
 
+        if self.args.robustHesseSplit is not None:
+            self.passthru.extend(['--robustHesseSplit', self.args.robustHesseSplit])
+            subbed_vars[('HESSESPLIT',)] = [(iSplit,) for iSplit in range(int(self.args.robustHesseSplit))]
+            self.passthru.extend(['--robustHesseIdx %(HESSESPLIT)s --robustHesse 1 --robustHesseSave hessian'+self.args.robustHesseSplit+'-%(HESSESPLIT)s.root']);
+            self.args.name += '.HESSESPLIT.%(HESSESPLIT)s'
+            print("want to try combine result here")
+
         # can only put the name option back now because we might have modified
         # it from what the user specified
+        # print(self.passthru)
         self.put_back_arg('name', '-n')
         proto = 'combine ' + (' '.join(self.passthru))
         if self.args.there:
