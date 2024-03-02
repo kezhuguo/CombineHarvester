@@ -245,11 +245,9 @@ class EnhancedCombine(CombineToolBase):
             subbed_vars[('HESSESPLIT',)] = [(iSplit,) for iSplit in range(int(self.args.robustHesseSplit))]
             self.passthru.extend(['--robustHesseIdx %(HESSESPLIT)s --robustHesse 1 --robustHesseSave hessian'+self.args.robustHesseSplit+'-%(HESSESPLIT)s.root']);
             self.args.name += '.HESSESPLIT.%(HESSESPLIT)s'
-            print("want to try combine result here")
 
         # can only put the name option back now because we might have modified
         # it from what the user specified
-        # print(self.passthru)
         self.put_back_arg('name', '-n')
         proto = 'combine ' + (' '.join(self.passthru))
         if self.args.there:
